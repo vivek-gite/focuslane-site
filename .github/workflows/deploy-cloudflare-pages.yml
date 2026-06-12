@@ -57,6 +57,19 @@ jobs:
       - name: Build Cloudflare Pages artifact
         run: npm run build:pages
 
+      - name: Stage Cloudflare Pages deploy folder
+        env:
+          DEPLOY_DIR: ${{ runner.temp }}/focuslane-pages-deploy
+        run: |
+          mkdir -p "$DEPLOY_DIR/public"
+          cp -R dist/client/. "$DEPLOY_DIR/public/"
+          cat > "$DEPLOY_DIR/wrangler.toml" <<EOF
+          name = "${CLOUDFLARE_PAGES_PROJECT_NAME}"
+          pages_build_output_dir = "public"
+          compatibility_date = "2026-06-12"
+          compatibility_flags = ["nodejs_compat"]
+          EOF
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v4
         with:
@@ -64,4 +77,5 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           wranglerVersion: 4.92.0
-          command: pages deploy dist/client --project-name=${{ env.CLOUDFLARE_PAGES_PROJECT_NAME }} --branch=${{ github.ref_name }} --commit-dirty=true
+          workingDirectory: ${{ runner.temp }}/focuslane-pages-deploy
+          command: pages deploy public --project-name=${{ env.CLOUDFLARE_PAGES_PROJECT_NAME }} --branch=${{ github.ref_name }} --commit-dirty=true
