@@ -22,6 +22,11 @@ await copyFile(
   path.join(pagesDir, "_worker.js"),
 );
 
+await copyFile(
+  path.join(serverDir, "index.js"),
+  path.join(pagesDir, "index.js"),
+);
+
 const supportEntries = [
   "__vite_rsc_assets_manifest.js",
   "image-config.json",
