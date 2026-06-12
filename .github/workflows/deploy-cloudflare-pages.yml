@@ -18,6 +18,8 @@ jobs:
   deploy:
     name: Build and deploy
     runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_PAGES_PROJECT_NAME: ${{ vars.CLOUDFLARE_PAGES_PROJECT_NAME || 'focuslane' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -55,4 +57,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: /tmp/focuslane-pages-deploy
-          command: pages deploy public --project-name=focuslane --branch=${{ github.ref_name }} --commit-dirty=true --no-bundle
+          command: pages deploy public --project-name=${{ env.CLOUDFLARE_PAGES_PROJECT_NAME }} --branch=${{ github.ref_name }} --commit-dirty=true --no-bundle
